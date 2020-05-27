@@ -1,0 +1,6 @@
+# Scores to updatd when a player changes their name
+uuid-based-scores:
+  - deaths
+  - 'num-advancements'
+  - buildscore
+  - votes
