@@ -3,6 +3,7 @@ package net.evmodder.ScoreboardUUID;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -43,8 +44,7 @@ public class ScoreboardUUID extends JavaPlugin implements Listener{
 		return player.getName();
 	}
 
-	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent evt){
+        private void onPlayerJoinSync(PlayerJoinEvent evt){
 		final String currName = evt.getPlayer().getName();
 		final String prevName = getPreviousName(evt.getPlayer());
 		if(!prevName.equals(currName)){
@@ -52,5 +52,11 @@ public class ScoreboardUUID extends JavaPlugin implements Listener{
 		}
 		evt.getPlayer().removeScoreboardTag("prev_name_"+prevName);
 		evt.getPlayer().addScoreboardTag("prev_name_"+currName);
+        }
+        
+        
+	@EventHandler
+	public void onPlayerJoinAsync(PlayerJoinEvent evt){
+                Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, ()->onPlayerJoinSync(evt), 1L);
 	}
 }
