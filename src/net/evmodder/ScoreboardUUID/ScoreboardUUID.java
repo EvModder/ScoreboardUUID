@@ -51,5 +51,7 @@ public class ScoreboardUUID extends EvPlugin implements Listener{
 		if(!prevName.equals(currName)){
 			updateScores(prevName, currName);
 		}
+		evt.getPlayer().removeScoreboardTag("prev_name_"+prevName);
+		evt.getPlayer().addScoreboardTag("prev_name_"+currName);
 	}
 }
