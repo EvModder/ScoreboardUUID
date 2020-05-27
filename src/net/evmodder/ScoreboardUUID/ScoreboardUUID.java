@@ -12,11 +12,9 @@ import org.bukkit.scoreboard.Scoreboard;
 import net.evmodder.EvLib.EvPlugin;
 
 public class ScoreboardUUID extends EvPlugin implements Listener{
-	private static ScoreboardUUID plugin; public static ScoreboardUUID getPlugin(){return plugin;}
 	List<String> scoresToUpdate;
 
 	@Override public void onEvEnable(){
-		plugin = this;
 		scoresToUpdate = getConfig().getStringList("uuid-based-scores");
 	}
 	@Override public void onEvDisable(){}
