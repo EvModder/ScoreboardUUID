@@ -5,14 +5,14 @@ version: 1.0 #1.0=initial release
 api-version: 1.13
 
 commands:
-   about:
-      description: View information about a player
-      usage: /about <name>
-      aliases: [seen,info]
-      permission: hardcore.about
+   yeet:
+      description: yeet
+      usage: /yeet
+      aliases: [yote]
+      permission: scoreboarduuid.yeet
       permission-message: You do not have permission to do this.
 
 permissions:
-   hardcore.about:
-      description: Permission to use /about
-      default: true
+   scoreboarduuid.yeet:
+      description: Permission to use /yeet
+      default: op
