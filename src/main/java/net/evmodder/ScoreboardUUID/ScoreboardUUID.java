@@ -7,17 +7,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
-import net.evmodder.EvLib.EvPlugin;
 
-public class ScoreboardUUID extends EvPlugin implements Listener{
+public class ScoreboardUUID extends JavaPlugin implements Listener{
 	List<String> scoresToUpdate;
 
-	@Override public void onEvEnable(){
+	@Override public void onEnable(){
 		scoresToUpdate = getConfig().getStringList("uuid-based-scores");
+                getServer().getPluginManager().registerEvents(this, this);
 	}
-	@Override public void onEvDisable(){}
+	@Override public void onDisable(){}
 
 	void updateScores(String oldName, String newName){
 		getLogger().info("Updating scoreboard of '"+oldName+"' to '"+newName+"'");
