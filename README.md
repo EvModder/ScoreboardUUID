@@ -1,2 +1,2 @@
-# HardcoreTweaks
-Description coming soon, maybe
+# ScoreboardUUID
+Better description coming soon, maybe
