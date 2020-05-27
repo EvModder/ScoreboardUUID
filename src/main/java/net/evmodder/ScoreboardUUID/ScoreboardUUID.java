@@ -9,8 +9,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
 
 public class ScoreboardUUID extends JavaPlugin implements Listener{
 	List<String> scoresToUpdate;
@@ -24,16 +26,33 @@ public class ScoreboardUUID extends JavaPlugin implements Listener{
 	void updateScores(String oldName, String newName){
 		getLogger().info("Updating scoreboard of '"+oldName+"' to '"+newName+"'");
 
-		final Scoreboard sb = getServer().getScoreboardManager().getMainScoreboard();
+                
+		final ScoreboardManager sm = getServer().getScoreboardManager();
+                if(sm==null) throw new IllegalStateException("World has not loaded yet - this is a bug!");
+                
+		final Scoreboard sb = sm.getMainScoreboard();
 		final HashMap<String, Integer> scores = new HashMap<String, Integer>();
+                
 		for(String scoreName : scoresToUpdate){
-			Score score = sb.getObjective(scoreName).getScore(oldName);
-			if(!score.isScoreSet()) continue;
-			scores.put(scoreName, score.getScore());
+                        Objective obj = sb.getObjective(scoreName);//TODO: handle exceptions
+                        if(obj == null){
+                            getLogger().warning("Scoreboard Objective "+scoreName+" doesn't exist!");
+                            continue;
+                        }
+			Score score = obj.getScore(oldName);//TODO: handle exceptions
+			if(!score.isScoreSet()) continue;//TODO: handle exceptions
+			scores.put(scoreName, score.getScore());//TODO: handle exceptions
 		}
-		sb.resetScores(oldName);
+		sb.resetScores(oldName);//TODO: handle exceptions
 		for(Entry<String, Integer> entry : scores.entrySet()){
-			sb.getObjective(entry.getKey()).getScore(newName).setScore(entry.getValue());
+                        String scoreName = entry.getKey();
+                        Objective obj = sb.getObjective(scoreName);//TODO: handle exceptions
+                        if(obj == null){
+                            getLogger().warning("Scoreboard Objective "+scoreName+" doesn't exist!");
+                            continue;
+                        }
+			Score newScore = obj.getScore(newName);//TODO: handle exceptions
+                        newScore.setScore(entry.getValue());//TODO: handle exceptions
 		}
 	}
 
