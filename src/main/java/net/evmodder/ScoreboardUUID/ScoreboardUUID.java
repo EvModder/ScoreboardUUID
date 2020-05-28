@@ -43,33 +43,33 @@ public class ScoreboardUUID extends JavaPlugin implements Listener {
 
         //collect scores for old username
         for (String scoreName : scoresToUpdate) {
-            Objective obj = sb.getObjective(scoreName);//TODO: handle exceptions
+            Objective obj = sb.getObjective(scoreName);
             if (obj == null) {
                 getLogger().warning("Scoreboard Objective " + scoreName + " doesn't exist!");
                 continue;
             }
-            Score score = obj.getScore(oldName);//TODO: handle exceptions
+            Score score = obj.getScore(oldName);
             if (!score.isScoreSet()) {
-                continue;//TODO: handle exceptions
+                continue;
             }
-            scores.put(scoreName, score.getScore());//TODO: handle exceptions
+            scores.put(scoreName, score.getScore());
         }
 
 
         //transfer collected scores to new user
         for (Entry<String, Integer> entry : scores.entrySet()) {
             String scoreName = entry.getKey();
-            Objective obj = sb.getObjective(scoreName);//TODO: handle exceptions
+            Objective obj = sb.getObjective(scoreName);
             if (obj == null) {
                 getLogger().warning("Scoreboard Objective " + scoreName + " doesn't exist!");
                 continue;
             }
-            Score newScore = obj.getScore(newName);//TODO: handle exceptions
-            newScore.setScore(entry.getValue());//TODO: handle exceptions
+            Score newScore = obj.getScore(newName);
+            newScore.setScore(entry.getValue());
         }
         
         //remove scores for old username
-        if(resetOldScores) sb.resetScores(oldName);//TODO: handle exceptions
+        if(resetOldScores) sb.resetScores(oldName);
     }
 
     String getPreviousName(Player player) {        
