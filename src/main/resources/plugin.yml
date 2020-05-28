@@ -1,7 +1,7 @@
 name: ScoreboardUUID
 main: net.evmodder.scoreboarduuid.ScoreboardUUID
-author: EvModder/EvDoc
-version: 1.0 #1.0=initial release
+authors: [EvModder/EvDoc,crashdemons]
+version: 2.0
 api-version: 1.13
 
 #commands:
