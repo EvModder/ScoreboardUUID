@@ -54,8 +54,6 @@ public class ScoreboardUUID extends JavaPlugin implements Listener {
             scores.put(scoreName, score.getScore());//TODO: handle exceptions
         }
 
-        //remove scores for old username
-        sb.resetScores(oldName);//TODO: handle exceptions
 
         //transfer collected scores to new user
         for (Entry<String, Integer> entry : scores.entrySet()) {
@@ -68,6 +66,9 @@ public class ScoreboardUUID extends JavaPlugin implements Listener {
             Score newScore = obj.getScore(newName);//TODO: handle exceptions
             newScore.setScore(entry.getValue());//TODO: handle exceptions
         }
+        
+        //remove scores for old username
+        sb.resetScores(oldName);//TODO: handle exceptions
     }
 
     String getPreviousName(Player player) {        
