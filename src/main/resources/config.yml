@@ -7,3 +7,6 @@ uuid-based-scores:
 
 #whether to delete old scoreboard entries when a player changes their name.
 reset-old-scores: true
+
+#set the scoreboard behavior for transferring scores to new username - can be OVERWRITE or ADD
+scoreboard-update-behavior: OVERWRITE

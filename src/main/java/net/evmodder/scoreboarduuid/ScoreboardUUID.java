@@ -1,5 +1,6 @@
 package net.evmodder.scoreboarduuid;
 
+import com.github.crashdemons.scoreboarduuid.ScoreboardUpdateBehavior;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -18,6 +19,7 @@ public class ScoreboardUUID extends JavaPlugin implements Listener {
 
     List<String> scoresToUpdate;
     boolean resetOldScores;
+    ScoreboardUpdateBehavior updateBehavior;
 
     @Override
     public void onEnable() {
@@ -25,6 +27,15 @@ public class ScoreboardUUID extends JavaPlugin implements Listener {
         super.reloadConfig();//shouldn't matter but sometimes...
         scoresToUpdate = getConfig().getStringList("uuid-based-scores");
         resetOldScores = getConfig().getBoolean("reset-old-scores");
+
+        String strUpdateBehavior = getConfig().getString("scoreboard-update-behavior");
+        try {
+            updateBehavior = ScoreboardUpdateBehavior.valueOf(strUpdateBehavior);
+        } catch (IllegalArgumentException e) {
+            updateBehavior = ScoreboardUpdateBehavior.OVERWRITE;
+            getLogger().warning("Invalid behavior type " + strUpdateBehavior + ". using " + updateBehavior.name());
+        }
+
         getServer().getPluginManager().registerEvents(this, this);
     }
 
@@ -32,20 +43,33 @@ public class ScoreboardUUID extends JavaPlugin implements Listener {
     public void onDisable() {
     }
 
-    boolean updateScore(Scoreboard sb, String scoreName, Integer scoreValue, Score newScoreObject){
-            newScoreObject.setScore(scoreValue);
-            return true;
+    boolean updateScore(Scoreboard sb, String scoreName, Integer scoreValue, Score newScoreObject) {
+        switch (updateBehavior) {
+            case OVERWRITE:
+                newScoreObject.setScore(scoreValue);
+                break;
+            case ADD:
+                int newScore = scoreValue;
+                if (newScoreObject.isScoreSet()) {
+                    newScore += newScoreObject.getScore();
+                }
+                newScoreObject.setScore(newScore);
+        }
+
+        newScoreObject.setScore(scoreValue);
+        return true;
     }
-    boolean updateScore(Scoreboard sb, String scoreName, Integer scoreValue, String newUsername){
-            Objective obj = sb.getObjective(scoreName);
-            if (obj == null) {
-                getLogger().warning("Scoreboard Objective " + scoreName + " doesn't exist!");
-                return false;
-            }
-            Score newScore = obj.getScore(newUsername);
-            return updateScore(sb, scoreName, scoreValue, newScore);
+
+    boolean updateScore(Scoreboard sb, String scoreName, Integer scoreValue, String newUsername) {
+        Objective obj = sb.getObjective(scoreName);
+        if (obj == null) {
+            getLogger().warning("Scoreboard Objective " + scoreName + " doesn't exist!");
+            return false;
+        }
+        Score newScore = obj.getScore(newUsername);
+        return updateScore(sb, scoreName, scoreValue, newScore);
     }
-    
+
     void updateScores(String oldName, String newName) {
         getLogger().info("Updating scoreboard of '" + oldName + "' to '" + newName + "'");
 
@@ -71,17 +95,18 @@ public class ScoreboardUUID extends JavaPlugin implements Listener {
             scores.put(scoreName, score.getScore());
         }
 
-
         //transfer collected scores to new user
         for (Entry<String, Integer> entry : scores.entrySet()) {
             updateScore(sb, entry.getKey(), entry.getValue(), newName);
         }
-        
+
         //remove scores for old username
-        if(resetOldScores) sb.resetScores(oldName);
+        if (resetOldScores) {
+            sb.resetScores(oldName);
+        }
     }
 
-    String getPreviousName(Player player) {        
+    String getPreviousName(Player player) {
         for (String tag : player.getScoreboardTags()) {
             if (tag.startsWith("prev_name_")) {
                 return tag.substring(10);
@@ -94,9 +119,9 @@ public class ScoreboardUUID extends JavaPlugin implements Listener {
         final String currName = evt.getPlayer().getName();
         final String prevName = getPreviousName(evt.getPlayer());
         if (!prevName.equals(currName)) {// name changed
-            try{
+            try {
                 updateScores(prevName, currName);
-            }catch(IllegalStateException ex){
+            } catch (IllegalStateException ex) {
                 return;//do not reset scoreboard tags if score update failed - attempt again.
             }
         }
