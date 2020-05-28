@@ -39,7 +39,7 @@ public class ScoreboardUUID extends JavaPlugin implements Listener {
         }
 
         final Scoreboard sb = sm.getMainScoreboard();
-        final HashMap<String, Integer> scores = new HashMap<String, Integer>();
+        final HashMap<String, Integer> scores = new HashMap<>();
 
         //collect scores for old username
         for (String scoreName : scoresToUpdate) {
