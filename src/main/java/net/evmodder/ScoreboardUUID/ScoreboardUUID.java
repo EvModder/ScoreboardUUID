@@ -3,6 +3,7 @@ package net.evmodder.ScoreboardUUID;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -69,7 +70,7 @@ public class ScoreboardUUID extends JavaPlugin implements Listener {
         }
     }
 
-    String getPreviousName(Player player) {
+    String getPreviousName(Player player) {        
         for (String tag : player.getScoreboardTags()) {
             if (tag.startsWith("prev_name_")) {
                 return tag.substring(10);
@@ -81,9 +82,14 @@ public class ScoreboardUUID extends JavaPlugin implements Listener {
     private void onPlayerJoinSync(PlayerJoinEvent evt) {
         final String currName = evt.getPlayer().getName();
         final String prevName = getPreviousName(evt.getPlayer());
-        if (!prevName.equals(currName)) {
-            updateScores(prevName, currName);
+        if (!prevName.equals(currName)) {// name changed
+            try{
+                updateScores(prevName, currName);
+            }catch(IllegalStateException ex){
+                return;//do not reset scoreboard tags if score update failed - attempt again.
+            }
         }
+        //reset tags for user.
         evt.getPlayer().removeScoreboardTag("prev_name_" + prevName);
         evt.getPlayer().addScoreboardTag("prev_name_" + currName);
     }
