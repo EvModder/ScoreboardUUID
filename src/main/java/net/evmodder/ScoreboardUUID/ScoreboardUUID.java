@@ -33,6 +33,7 @@ public class ScoreboardUUID extends JavaPlugin implements Listener{
 		final Scoreboard sb = sm.getMainScoreboard();
 		final HashMap<String, Integer> scores = new HashMap<String, Integer>();
                 
+                //collect scores for old username
 		for(String scoreName : scoresToUpdate){
                         Objective obj = sb.getObjective(scoreName);//TODO: handle exceptions
                         if(obj == null){
@@ -43,7 +44,11 @@ public class ScoreboardUUID extends JavaPlugin implements Listener{
 			if(!score.isScoreSet()) continue;//TODO: handle exceptions
 			scores.put(scoreName, score.getScore());//TODO: handle exceptions
 		}
+                
+                //remove scores for old username
 		sb.resetScores(oldName);//TODO: handle exceptions
+                
+                //transfer collected scores to new user
 		for(Entry<String, Integer> entry : scores.entrySet()){
                         String scoreName = entry.getKey();
                         Objective obj = sb.getObjective(scoreName);//TODO: handle exceptions
