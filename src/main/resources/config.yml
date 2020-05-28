@@ -4,3 +4,6 @@ uuid-based-scores:
   - 'num-advancements'
   - buildscore
   - votes
+
+#whether to delete old scoreboard entries when a player changes their name.
+reset-old-scores: true

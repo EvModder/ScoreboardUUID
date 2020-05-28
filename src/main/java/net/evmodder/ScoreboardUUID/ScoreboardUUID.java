@@ -17,10 +17,12 @@ import org.bukkit.scoreboard.ScoreboardManager;
 public class ScoreboardUUID extends JavaPlugin implements Listener {
 
     List<String> scoresToUpdate;
+    boolean resetOldScores;
 
     @Override
     public void onEnable() {
         scoresToUpdate = getConfig().getStringList("uuid-based-scores");
+        resetOldScores = getConfig().getBoolean("reset-old-scores");
         getServer().getPluginManager().registerEvents(this, this);
     }
 
@@ -67,7 +69,7 @@ public class ScoreboardUUID extends JavaPlugin implements Listener {
         }
         
         //remove scores for old username
-        sb.resetScores(oldName);//TODO: handle exceptions
+        if(resetOldScores) sb.resetScores(oldName);//TODO: handle exceptions
     }
 
     String getPreviousName(Player player) {        
