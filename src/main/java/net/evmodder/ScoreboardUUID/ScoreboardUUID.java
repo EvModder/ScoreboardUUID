@@ -32,6 +32,20 @@ public class ScoreboardUUID extends JavaPlugin implements Listener {
     public void onDisable() {
     }
 
+    boolean updateScore(Scoreboard sb, String scoreName, Integer scoreValue, Score newScoreObject){
+            newScoreObject.setScore(scoreValue);
+            return true;
+    }
+    boolean updateScore(Scoreboard sb, String scoreName, Integer scoreValue, String newUsername){
+            Objective obj = sb.getObjective(scoreName);
+            if (obj == null) {
+                getLogger().warning("Scoreboard Objective " + scoreName + " doesn't exist!");
+                return false;
+            }
+            Score newScore = obj.getScore(newUsername);
+            return updateScore(sb, scoreName, scoreValue, newScore);
+    }
+    
     void updateScores(String oldName, String newName) {
         getLogger().info("Updating scoreboard of '" + oldName + "' to '" + newName + "'");
 
@@ -60,14 +74,7 @@ public class ScoreboardUUID extends JavaPlugin implements Listener {
 
         //transfer collected scores to new user
         for (Entry<String, Integer> entry : scores.entrySet()) {
-            String scoreName = entry.getKey();
-            Objective obj = sb.getObjective(scoreName);
-            if (obj == null) {
-                getLogger().warning("Scoreboard Objective " + scoreName + " doesn't exist!");
-                continue;
-            }
-            Score newScore = obj.getScore(newName);
-            newScore.setScore(entry.getValue());
+            updateScore(sb, entry.getKey(), entry.getValue(), newName);
         }
         
         //remove scores for old username
