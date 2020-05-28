@@ -21,6 +21,8 @@ public class ScoreboardUUID extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        saveDefaultConfig();//fails if it exists
+        super.reloadConfig();//shouldn't matter but sometimes...
         scoresToUpdate = getConfig().getStringList("uuid-based-scores");
         resetOldScores = getConfig().getBoolean("reset-old-scores");
         getServer().getPluginManager().registerEvents(this, this);
