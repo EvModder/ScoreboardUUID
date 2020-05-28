@@ -122,6 +122,7 @@ public class ScoreboardUUID extends JavaPlugin implements Listener {
             try {
                 updateScores(prevName, currName);
             } catch (IllegalStateException ex) {
+                getLogger().warning("Error updating scores - was the objective deleted?");
                 return;//do not reset scoreboard tags if score update failed - attempt again.
             }
         }
