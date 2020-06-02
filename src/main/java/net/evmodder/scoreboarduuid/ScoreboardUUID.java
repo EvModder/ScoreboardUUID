@@ -47,15 +47,17 @@ public class ScoreboardUUID extends JavaPlugin implements Listener {
         switch (updateBehavior) {
             case OVERWRITE:
                 newScoreObject.setScore(scoreValue);
-                break;
+                return true;
             case ADD:
                 int newScore = scoreValue;
                 if (newScoreObject.isScoreSet()) {
                     newScore += newScoreObject.getScore();
                 }
                 newScoreObject.setScore(newScore);
+                return true;
+            default:
+                throw new IllegalArgumentException("Unsupported behavior type - this is a bug!");
         }
-        return true;
     }
 
     boolean updateScore(Scoreboard sb, String scoreName, Integer scoreValue, String newUsername) {
