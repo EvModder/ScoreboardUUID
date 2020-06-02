@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry excluding="net/evmodder/EvLib/hooks/WorldEditHook.java|net/evmodder/EvLib/particles/|net/evmodder/EvLib/noteblockapi/|net/evmodder/EvLib/hooks/|net/evmodder/EvLib/extras/ButcherUtils.java|net/evmodder/EvLib/extras/CommandUtils.java|net/evmodder/EvLib/extras/DisguiseUtils.java|net/evmodder/EvLib/extras/GhostUtils.java|net/evmodder/EvLib/extras/ReflectionUtils.java|net/evmodder/EvLib/extras/RefNBTBase.java|net/evmodder/EvLib/extras/RefNBTTag.java|net/evmodder/EvLib/extras/RefNBTTagList.java|net/evmodder/EvLib/extras/TabText.java|net/evmodder/EvLib/extras/TypeUtils.java|net/evmodder/EvLib/extras/WebUtils.java|net/evmodder/EvLib/util/Fraction.java|net/evmodder/EvLib/util/IndexMultiMapDriver.java|net/evmodder/EvLib/util/IndexTreeMap.java|net/evmodder/EvLib/util/IndexTreeMultiMap.java|net/evmodder/EvLib/util/IndexTreeMultiMap2.java|net/evmodder/EvLib/util/Section.java|net/evmodder/EvLib/util/UnionFind.java|net/evmodder/EvLib/extras/TellrawUtils.java|net/evmodder/EvLib/extras/NBTTagUtils.java|net/evmodder/EvLib/extras/HeadUtils.java|net/evmodder/EvLib/extras/SelectorUtils.java|net/evmodder/EvLib/extras/|net/evmodder/EvLib/util/|net/evmodder/EvLib/EvCommand.java|net/evmodder/EvLib/EvUtils.java|net/evmodder/EvLib/Updater.java|net/evmodder/EvLib/FileIO.java" kind="src" path="EvLib"/>
+	<classpathentry excluding="net/evmodder/EvLib/hooks/WorldEditHook.java|net/evmodder/EvLib/particles/|net/evmodder/EvLib/noteblockapi/|net/evmodder/EvLib/hooks/|net/evmodder/EvLib/extras/ButcherUtils.java|net/evmodder/EvLib/extras/CommandUtils.java|net/evmodder/EvLib/extras/DisguiseUtils.java|net/evmodder/EvLib/extras/GhostUtils.java|net/evmodder/EvLib/extras/ReflectionUtils.java|net/evmodder/EvLib/extras/RefNBTBase.java|net/evmodder/EvLib/extras/RefNBTTag.java|net/evmodder/EvLib/extras/RefNBTTagList.java|net/evmodder/EvLib/extras/TabText.java|net/evmodder/EvLib/extras/TypeUtils.java|net/evmodder/EvLib/extras/WebUtils.java|net/evmodder/EvLib/util/Fraction.java|net/evmodder/EvLib/util/IndexMultiMapDriver.java|net/evmodder/EvLib/util/IndexTreeMap.java|net/evmodder/EvLib/util/IndexTreeMultiMap.java|net/evmodder/EvLib/util/IndexTreeMultiMap2.java|net/evmodder/EvLib/util/Section.java|net/evmodder/EvLib/util/UnionFind.java|net/evmodder/EvLib/extras/TellrawUtils.java|net/evmodder/EvLib/extras/NBTTagUtils.java|net/evmodder/EvLib/extras/HeadUtils.java|net/evmodder/EvLib/extras/SelectorUtils.java|net/evmodder/EvLib/extras/|net/evmodder/EvLib/EvCommand.java|net/evmodder/EvLib/EvUtils.java|net/evmodder/EvLib/Updater.java|net/evmodder/EvLib/util/Tuple3.java" kind="src" path="EvLib"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/Nate/Dropbox/Minecraft/Development/Libraries/Vault.jar"/>
-	<classpathentry kind="lib" path="/Users/Nate/Dropbox/Minecraft/Development/Libraries/Essentials.jar"/>
-	<classpathentry kind="lib" path="/Users/Nate/Dropbox/Minecraft/Development/Libraries/HorseOwners.jar"/>
-	<classpathentry kind="lib" path="/Users/Nate/Dropbox/Minecraft/Development/Libraries/spigot_server.jar"/>
-	<classpathentry kind="lib" path="/Users/Nate/Dropbox/Minecraft/Development/Libraries/bukkit-1.15.jar"/>
+	<classpathentry kind="lib" path="/Users/Nate/Dropbox/Minecraft/Development/Libraries/bukkit1.13+.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

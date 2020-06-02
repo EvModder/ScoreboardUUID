@@ -1,6 +1,14 @@
-# Scores to updatd when a player changes their name
+# Scoreboard objectives to update when a player changes their name.
+# Key is the name of an objective, value (after colon) is the transfer mode
+#OVERWRITE: replaces scores for 'newname' with the scores from 'oldname'
+#SAVE_MOVE: throws an error if scores for 'newname' are already defined
+#ADD: moves scores and merges with already existing scores for 'newname'
+
 uuid-based-scores:
-  - deaths
-  - 'num-advancements'
-  - buildscore
-  - votes
+  deaths: OVERWRITE
+  num-advancements: OVERWRITE
+  buildscore: SAFE_MOVE
+  votes: ADD
+
+# Whether to delete old scoreboard entries when a player changes their name (after moving scores)
+reset-old-scores: true

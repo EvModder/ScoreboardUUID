@@ -1,18 +1,5 @@
 name: ScoreboardUUID
 main: net.evmodder.ScoreboardUUID.ScoreboardUUID
-author: EvModder/EvDoc
-version: 1.0 #1.0=initial release
+author: [EvModder/EvDoc,crashdemons]
+version: 2.0 #2.0=crashdemons merge
 api-version: 1.13
-
-commands:
-   yeet:
-      description: yeet
-      usage: /yeet
-      aliases: [yote]
-      permission: scoreboarduuid.yeet
-      permission-message: You do not have permission to do this.
-
-permissions:
-   scoreboarduuid.yeet:
-      description: Permission to use /yeet
-      default: op
