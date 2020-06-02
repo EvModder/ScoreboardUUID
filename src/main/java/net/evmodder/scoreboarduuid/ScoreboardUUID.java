@@ -55,8 +55,6 @@ public class ScoreboardUUID extends JavaPlugin implements Listener {
                 }
                 newScoreObject.setScore(newScore);
         }
-
-        newScoreObject.setScore(scoreValue);
         return true;
     }
 
