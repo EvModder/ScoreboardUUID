@@ -20,8 +20,8 @@ import org.bukkit.scoreboard.ScoreboardManager;
 * @author EvModder/EvDoc (evdoc at altcraft.net)
 */
 public class ScoreboardUUID extends EvPlugin implements Listener{
-	ScoreboardUpdateBehavior defaultMode;
 	HashMap<String, ScoreboardUpdateBehavior> scoresToUpdate;
+	ScoreboardUpdateBehavior defaultMode;
 	boolean resetOldScores;
 
 	private ScoreboardUpdateBehavior parseUpdateBehavior(String strUpdateBehavior){
@@ -42,6 +42,7 @@ public class ScoreboardUUID extends EvPlugin implements Listener{
 		defaultMode = parseUpdateBehavior(getConfig().getString("default-mode", "NONE"));
 
 		ConfigurationSection scoreListSection = getConfig().getConfigurationSection("uuid-based-scores");
+		scoresToUpdate = new HashMap<>();
 		for(String key : scoreListSection.getKeys(false)){
 			scoresToUpdate.put(key, parseUpdateBehavior(scoreListSection.getString(key)));
 		}
