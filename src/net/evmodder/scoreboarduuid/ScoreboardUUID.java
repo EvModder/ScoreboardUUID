@@ -20,8 +20,17 @@ import org.bukkit.scoreboard.ScoreboardManager;
 * @author EvModder/EvDoc (evdoc at altcraft.net)
 */
 public class ScoreboardUUID extends EvPlugin implements Listener{
+	ScoreboardUpdateBehavior defaultMode;
 	HashMap<String, ScoreboardUpdateBehavior> scoresToUpdate;
 	boolean resetOldScores;
+
+	private ScoreboardUpdateBehavior parseUpdateBehavior(String strUpdateBehavior){
+		try{return ScoreboardUpdateBehavior.valueOf(strUpdateBehavior.toUpperCase());}
+		catch(IllegalArgumentException e){
+			getLogger().warning("Invalid behavior type '" + strUpdateBehavior + "'");
+			return defaultMode;
+		}
+	}
 
 	@Override public void onEvEnable(){
 		if(!getConfig().isConfigurationSection("uuid-based-scores")){
@@ -30,25 +39,17 @@ public class ScoreboardUUID extends EvPlugin implements Listener{
 			return;
 		}
 		resetOldScores = getConfig().getBoolean("reset-old-scores", true);
+		defaultMode = parseUpdateBehavior(getConfig().getString("default-mode", "NONE"));
 
 		ConfigurationSection scoreListSection = getConfig().getConfigurationSection("uuid-based-scores");
 		for(String key : scoreListSection.getKeys(false)){
-			String strUpdateBehavior = getConfig().getString("scoreboard-update-behavior", "OVERWRITE");
-			ScoreboardUpdateBehavior updateBehavior;
-			try{
-				updateBehavior = ScoreboardUpdateBehavior.valueOf(strUpdateBehavior);
-			}
-			catch(IllegalArgumentException e){
-				updateBehavior = ScoreboardUpdateBehavior.OVERWRITE;
-				getLogger().warning("Invalid behavior type '" + strUpdateBehavior + "' for score '" + key + "' using " + updateBehavior.name());
-			}
-			scoresToUpdate.put(key, updateBehavior);
+			scoresToUpdate.put(key, parseUpdateBehavior(scoreListSection.getString(key)));
 		}
 
 		getServer().getPluginManager().registerEvents(this, this);
 	}
 
-	boolean updateScore(Objective obj, String username, int scoreValue, ScoreboardUpdateBehavior updateBehavior){
+	boolean setNewScore(Objective obj, String username, int scoreValue, ScoreboardUpdateBehavior updateBehavior){
 		Score newScoreObject = obj.getScore(username);
 
 		int newScoreValue;
@@ -64,12 +65,12 @@ public class ScoreboardUUID extends EvPlugin implements Listener{
 			case ADD:
 				newScoreValue = scoreValue + (newScoreObject.isScoreSet() ? newScoreObject.getScore() : 0);
 				break;
+			case NONE:
+				return false;
 			default:
 				getLogger().severe("Encountered invalid behavior type " + updateBehavior + " while updating score: " + obj.getName());
-				newScoreValue = -1;
 				return false;
 		}
-		//if(newScoreObject.isScoreSet() && newScoreObject.getScore() == newScoreValue) return false; // no change occurred.
 		newScoreObject.setScore(newScoreValue);
 		return true;
 	}
@@ -97,25 +98,25 @@ public class ScoreboardUUID extends EvPlugin implements Listener{
 			scores.put(obj, new Pair<>(score.getScore(), entry.getValue()));
 		}
 
-		boolean moveSuccess = true;
 		// transfer collected scores to new username.
+		boolean totalSuccess = true;
+		HashMap<Objective, Integer> scoresToKeep = new HashMap<>();
 		for(Entry<Objective, Pair<Integer, ScoreboardUpdateBehavior>> entry : scores.entrySet()){
-			moveSuccess &= updateScore(entry.getKey(), newName, entry.getValue().a, entry.getValue().b);
+			boolean moveSuccess = setNewScore(entry.getKey(), newName, entry.getValue().a, entry.getValue().b);
+			if(!moveSuccess){
+				scoresToKeep.put(entry.getKey(), entry.getValue().a);
+				if(entry.getValue().b != ScoreboardUpdateBehavior.NONE) totalSuccess = false;
+			}
 		}
 
 		// clear scores for old username.
-		if(resetOldScores && moveSuccess){
-			HashMap<Objective, Integer> scoresToKeep = new HashMap<>();
-			for(Objective obj : sb.getObjectives()){
-				if(scoresToUpdate.containsKey(obj.getName()) || !obj.getScore(oldName).isScoreSet()) continue;
-				scoresToKeep.put(obj, obj.getScore(oldName).getScore());
-			}
+		if(resetOldScores){
 			sb.resetScores(oldName);
 			for(Entry<Objective, Integer> entry : scoresToKeep.entrySet()){
 				entry.getKey().getScore(oldName).setScore(entry.getValue());
 			}
 		}
-		return moveSuccess;
+		return totalSuccess;
 	}
 
 	String getPreviousName(Player player){
