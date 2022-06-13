@@ -2,6 +2,6 @@ name: ScoreboardUUID
 main: net.evmodder.scoreboarduuid.ScoreboardUUID
 authors: [EvModder, crashdemons]
 website: https://github.com/EvModder/ScoreboardUUID
-description: Updates scoreboards when a player changes their name.
+description: Update scoreboards when players change names.
 version: 3.0 #3 fix bugs, add NONE update-mode and default update mode
 api-version: 1.13
