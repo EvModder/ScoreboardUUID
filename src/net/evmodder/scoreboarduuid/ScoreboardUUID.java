@@ -2,14 +2,19 @@ package net.evmodder.scoreboarduuid;
 
 import com.github.crashdemons.scoreboarduuid.ScoreboardUpdateBehavior;
 import net.evmodder.EvLib.EvPlugin;
+import net.evmodder.EvLib.extras.WebUtils;
 import net.evmodder.EvLib.util.Pair;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.UUID;
 import java.util.Map.Entry;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
@@ -21,6 +26,8 @@ import org.bukkit.scoreboard.ScoreboardManager;
 */
 public class ScoreboardUUID extends EvPlugin implements Listener{
 	HashMap<String, ScoreboardUpdateBehavior> scoresToUpdate;
+	HashMap<UUID, String> previousName;
+//	HashMap<String, String> newName;
 	ScoreboardUpdateBehavior defaultMode;
 	boolean resetOldScores;
 
@@ -47,6 +54,7 @@ public class ScoreboardUUID extends EvPlugin implements Listener{
 			scoresToUpdate.put(key, parseUpdateBehavior(scoreListSection.getString(key)));
 		}
 
+		previousName = new HashMap<>();
 		getServer().getPluginManager().registerEvents(this, this);
 	}
 
@@ -55,6 +63,14 @@ public class ScoreboardUUID extends EvPlugin implements Listener{
 
 		int newScoreValue;
 		switch(updateBehavior){
+			/*case CASCADE_MOVE:
+				if(newScoreObject.isScoreSet()){
+					final String newUsername = newName.get(username);
+					if(setNewScore(obj, newUsername, newScoreObject.getScore(), updateBehavior)){
+						newScoreObject.setScore(scoreValue);
+						return true;
+					}
+				}*/
 			case SAFE_MOVE:
 				if(newScoreObject.isScoreSet()){
 					getLogger().severe("Failed to update score '" + obj.getName() + "' for user '" + username +"' - entry already exists!");
@@ -87,7 +103,7 @@ public class ScoreboardUUID extends EvPlugin implements Listener{
 		final Scoreboard sb = sm.getMainScoreboard();
 		final HashMap<Objective, Pair<Integer, ScoreboardUpdateBehavior>> scores = new HashMap<>();
 
-		// collect scores for old username.
+		// Collect scores for old username.
 		for(Entry<String, ScoreboardUpdateBehavior> entry : scoresToUpdate.entrySet()){
 			Objective obj = sb.getObjective(entry.getKey());
 			if(obj == null){
@@ -99,18 +115,18 @@ public class ScoreboardUUID extends EvPlugin implements Listener{
 			scores.put(obj, new Pair<>(score.getScore(), entry.getValue()));
 		}
 
-		// transfer collected scores to new username.
+		// Transfer collected scores to new username.
 		boolean totalSuccess = true;
 		HashMap<Objective, Integer> scoresToKeep = new HashMap<>();
 		for(Entry<Objective, Pair<Integer, ScoreboardUpdateBehavior>> entry : scores.entrySet()){
 			boolean moveSuccess = setNewScore(entry.getKey(), newName, entry.getValue().a, entry.getValue().b);
 			if(!moveSuccess){
-				scoresToKeep.put(entry.getKey(), entry.getValue().a);
+				if(resetOldScores) scoresToKeep.put(entry.getKey(), entry.getValue().a);
 				if(entry.getValue().b != ScoreboardUpdateBehavior.NONE) totalSuccess = false;
 			}
 		}
 
-		// clear scores for old username.
+		// Clear scores for old username.
 		if(resetOldScores){
 			sb.resetScores(oldName);
 			for(Entry<Objective, Integer> entry : scoresToKeep.entrySet()){
@@ -120,35 +136,60 @@ public class ScoreboardUUID extends EvPlugin implements Listener{
 		return totalSuccess;
 	}
 
-	String getPreviousName(Player player){
-		for(String tag : player.getScoreboardTags()){
-			if(tag.startsWith("prev_name_")) return tag.substring(10);
-		}
-		return player.getName();
+	private void updateScoresOrPrintError(String oldName, String newName){
+		boolean success = false;
+		try{success = updateScores(oldName, newName);}
+		catch(IllegalStateException ex){success = false;}
+		if(!success) getLogger().warning("Encountered error whilst updating scores for player '" + oldName + "' -> '" + newName + "'!");
 	}
 
 	private void onPlayerJoinSync(PlayerJoinEvent evt){
+		getLogger().info("evt.getPlayer().getName()3: "+evt.getPlayer().getName());
+		getLogger().info("offlinePlayer.getName()3: "+getServer().getOfflinePlayer(evt.getPlayer().getUniqueId()).getName());
+		getLogger().info("offlinePlayer.getUUID()3: "+getServer().getOfflinePlayer(evt.getPlayer().getName()).getUniqueId());
 		final String currName = evt.getPlayer().getName();
-		final String prevName = getPreviousName(evt.getPlayer());
-		if(!prevName.equals(currName)){ // name changed.
-			boolean success = false;
-			try{
-				success = updateScores(prevName, currName);
-			}
-			catch(IllegalStateException ex){
-				success = false;
-			}
-			if(!success){
-				getLogger().warning("Encountered error whilst updating scores for player '" + currName + "'!");
-				return; // do not reset scoreboard tags if score update failed - attempt again later.
+		final String prevName = previousName.remove(evt.getPlayer().getUniqueId());
+		if(prevName != null){
+			if(!prevName.equals(currName)){  // Name got changed.
+				updateScoresOrPrintError(prevName, currName);
 			}
 		}
-		// reset tags for user.
-		evt.getPlayer().removeScoreboardTag("prev_name_" + prevName);
-		evt.getPlayer().addScoreboardTag("prev_name_" + currName);
 	}
 
 	@EventHandler public void onPlayerJoinAsync(PlayerJoinEvent evt){
 		getServer().getScheduler().scheduleSyncDelayedTask(this, () -> onPlayerJoinSync(evt), 1L);
+	}
+
+	@SuppressWarnings("deprecation")
+	@EventHandler public void onPlayerLogin(PlayerLoginEvent evt){
+		previousName.put(evt.getPlayer().getUniqueId(), getServer().getOfflinePlayer(evt.getPlayer().getUniqueId()).getName());
+		OfflinePlayer offlinePlayer = getServer().getOfflinePlayer(evt.getPlayer().getName());
+		UUID uuidOfNewPlayer = evt.getPlayer().getUniqueId();
+		if(offlinePlayer.getName() != null && !offlinePlayer.getUniqueId().equals(uuidOfNewPlayer)){
+			ArrayList<String> nameUpdates = new ArrayList<>();
+			nameUpdates.add(evt.getPlayer().getName());
+			while(offlinePlayer.getName() != null && !offlinePlayer.getUniqueId().equals(uuidOfNewPlayer)){
+				final String newName = WebUtils.getGameProfile(""+offlinePlayer.getUniqueId(), /*fetchSkin=*/false).getName();
+				nameUpdates.add(newName);
+				uuidOfNewPlayer = offlinePlayer.getUniqueId();
+				offlinePlayer = getServer().getOfflinePlayer(newName);
+			}
+			for(int i = nameUpdates.size()-1; i > 0; --i){
+				updateScoresOrPrintError(nameUpdates.get(i-1), nameUpdates.get(i));
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onPlayerLogin1(PlayerLoginEvent evt){
+		getLogger().info("evt.getPlayer().getName()1: "+evt.getPlayer().getName());
+		getLogger().info("offlinePlayer.getName()1: "+getServer().getOfflinePlayer(evt.getPlayer().getUniqueId()).getName());
+		getLogger().info("offlinePlayer.getUUID()1: "+getServer().getOfflinePlayer(evt.getPlayer().getName()).getUniqueId());
+	}
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerLogin2(PlayerLoginEvent evt){
+		getLogger().info("evt.getPlayer().getName()2: "+evt.getPlayer().getName());
+		getLogger().info("offlinePlayer.getName()2: "+getServer().getOfflinePlayer(evt.getPlayer().getUniqueId()).getName());
+		getLogger().info("offlinePlayer.getUUID()2: "+getServer().getOfflinePlayer(evt.getPlayer().getName()).getUniqueId());
 	}
 }
