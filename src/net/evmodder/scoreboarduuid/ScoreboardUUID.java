@@ -19,6 +19,7 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.scoreboard.Team;
 
 /**
 *
@@ -29,7 +30,7 @@ public class ScoreboardUUID extends EvPlugin implements Listener{
 	HashMap<UUID, String> previousName;
 //	HashMap<String, String> newName;
 	ScoreboardUpdateBehavior defaultMode;
-	boolean resetOldScores;
+	boolean RESET_OLD_SCORES, UPDATE_TEAMS;
 
 	private ScoreboardUpdateBehavior parseUpdateBehavior(String strUpdateBehavior){
 		try{return ScoreboardUpdateBehavior.valueOf(strUpdateBehavior.toUpperCase());}
@@ -45,7 +46,8 @@ public class ScoreboardUUID extends EvPlugin implements Listener{
 			this.onDisable();
 			return;
 		}
-		resetOldScores = getConfig().getBoolean("reset-old-scores", true);
+		UPDATE_TEAMS = getConfig().getBoolean("update-teams", true);
+		RESET_OLD_SCORES = getConfig().getBoolean("reset-old-scores", true);
 		defaultMode = parseUpdateBehavior(getConfig().getString("default-mode", "NONE"));
 
 		ConfigurationSection scoreListSection = getConfig().getConfigurationSection("uuid-based-scores");
@@ -121,13 +123,13 @@ public class ScoreboardUUID extends EvPlugin implements Listener{
 		for(Entry<Objective, Pair<Integer, ScoreboardUpdateBehavior>> entry : scores.entrySet()){
 			boolean moveSuccess = setNewScore(entry.getKey(), newName, entry.getValue().a, entry.getValue().b);
 			if(!moveSuccess){
-				if(resetOldScores) scoresToKeep.put(entry.getKey(), entry.getValue().a);
+				if(RESET_OLD_SCORES) scoresToKeep.put(entry.getKey(), entry.getValue().a);
 				if(entry.getValue().b != ScoreboardUpdateBehavior.NONE) totalSuccess = false;
 			}
 		}
 
 		// Clear scores for old username.
-		if(resetOldScores){
+		if(RESET_OLD_SCORES){
 			sb.resetScores(oldName);
 			for(Entry<Objective, Integer> entry : scoresToKeep.entrySet()){
 				entry.getKey().getScore(oldName).setScore(entry.getValue());
@@ -143,15 +145,24 @@ public class ScoreboardUUID extends EvPlugin implements Listener{
 		if(!success) getLogger().warning("Encountered error whilst updating scores for player '" + oldName + "' -> '" + newName + "'!");
 	}
 
+	private void updateTeamEntry(String oldName, String newName){
+		final Team team = getServer().getScoreboardManager().getMainScoreboard().getEntryTeam(oldName);
+		if(team != null){
+			team.removeEntry(oldName);
+			team.addEntry(newName);
+		}
+	}
+
 	private void onPlayerJoinSync(PlayerJoinEvent evt){
-		getLogger().info("evt.getPlayer().getName()3: "+evt.getPlayer().getName());
-		getLogger().info("offlinePlayer.getName()3: "+getServer().getOfflinePlayer(evt.getPlayer().getUniqueId()).getName());
-		getLogger().info("offlinePlayer.getUUID()3: "+getServer().getOfflinePlayer(evt.getPlayer().getName()).getUniqueId());
+//		getLogger().info("evt.getPlayer().getName()4: "+evt.getPlayer().getName());
+//		getLogger().info("offlinePlayer.getName()4: "+getServer().getOfflinePlayer(evt.getPlayer().getUniqueId()).getName());
+//		getLogger().info("offlinePlayer.getUUID()4: "+getServer().getOfflinePlayer(evt.getPlayer().getName()).getUniqueId());
 		final String currName = evt.getPlayer().getName();
 		final String prevName = previousName.remove(evt.getPlayer().getUniqueId());
 		if(prevName != null){
 			if(!prevName.equals(currName)){  // Name got changed.
 				updateScoresOrPrintError(prevName, currName);
+				if(UPDATE_TEAMS) updateTeamEntry(prevName, currName);
 			}
 		}
 	}
@@ -162,6 +173,9 @@ public class ScoreboardUUID extends EvPlugin implements Listener{
 
 	@SuppressWarnings("deprecation")
 	@EventHandler public void onPlayerLogin(PlayerLoginEvent evt){
+//		getLogger().info("evt.getPlayer().getName()2: "+evt.getPlayer().getName());
+//		getLogger().info("offlinePlayer.getName()2: "+getServer().getOfflinePlayer(evt.getPlayer().getUniqueId()).getName());
+//		getLogger().info("offlinePlayer.getUUID()2: "+getServer().getOfflinePlayer(evt.getPlayer().getName()).getUniqueId());
 		previousName.put(evt.getPlayer().getUniqueId(), getServer().getOfflinePlayer(evt.getPlayer().getUniqueId()).getName());
 		OfflinePlayer offlinePlayer = getServer().getOfflinePlayer(evt.getPlayer().getName());
 		UUID uuidOfNewPlayer = evt.getPlayer().getUniqueId();
@@ -181,15 +195,15 @@ public class ScoreboardUUID extends EvPlugin implements Listener{
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onPlayerLogin1(PlayerLoginEvent evt){
-		getLogger().info("evt.getPlayer().getName()1: "+evt.getPlayer().getName());
-		getLogger().info("offlinePlayer.getName()1: "+getServer().getOfflinePlayer(evt.getPlayer().getUniqueId()).getName());
-		getLogger().info("offlinePlayer.getUUID()1: "+getServer().getOfflinePlayer(evt.getPlayer().getName()).getUniqueId());
+	public void onPlayerLoginLowest(PlayerLoginEvent evt){
+//		getLogger().info("evt.getPlayer().getName()1: "+evt.getPlayer().getName());
+//		getLogger().info("offlinePlayer.getName()1: "+getServer().getOfflinePlayer(evt.getPlayer().getUniqueId()).getName());
+//		getLogger().info("offlinePlayer.getUUID()1: "+getServer().getOfflinePlayer(evt.getPlayer().getName()).getUniqueId());
 	}
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void onPlayerLogin2(PlayerLoginEvent evt){
-		getLogger().info("evt.getPlayer().getName()2: "+evt.getPlayer().getName());
-		getLogger().info("offlinePlayer.getName()2: "+getServer().getOfflinePlayer(evt.getPlayer().getUniqueId()).getName());
-		getLogger().info("offlinePlayer.getUUID()2: "+getServer().getOfflinePlayer(evt.getPlayer().getName()).getUniqueId());
+	public void onPlayerLoginMonitor(PlayerLoginEvent evt){
+//		getLogger().info("evt.getPlayer().getName()3: "+evt.getPlayer().getName());
+//		getLogger().info("offlinePlayer.getName()3: "+getServer().getOfflinePlayer(evt.getPlayer().getUniqueId()).getName());
+//		getLogger().info("offlinePlayer.getUUID()3: "+getServer().getOfflinePlayer(evt.getPlayer().getName()).getUniqueId());
 	}
 }

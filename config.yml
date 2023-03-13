@@ -16,3 +16,6 @@ default-mode: SAFE_MOVE
 
 # Whether to delete old scoreboard entries when a player changes their name (after moving scores)
 reset-old-scores: true
+
+# Whether to also preserve a player's assigned team when they change their name
+update-teams: true
