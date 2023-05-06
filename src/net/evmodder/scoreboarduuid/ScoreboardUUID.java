@@ -26,7 +26,7 @@ import org.bukkit.scoreboard.Team;
 * @author EvModder/EvDoc (evdoc at altcraft.net)
 */
 public class ScoreboardUUID extends EvPlugin implements Listener{
-	HashMap<String, ScoreboardUpdateBehavior> scoresToUpdate;
+	HashMap<String, ScoreboardUpdateBehavior> scoresToUpdate;//TODO: Support wildcards. E.g., in config.yml: "'pstats-*': NONE"
 	HashMap<UUID, String> previousName;
 //	HashMap<String, String> newName;
 	ScoreboardUpdateBehavior defaultMode;
