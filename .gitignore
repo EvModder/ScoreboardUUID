@@ -1,0 +1,13 @@
+/bin/
+*.class
+*.un~
+.settings
+.project
+.classpath
+.DS_Store
+*/.DS_Store
+*/*/.DS_Store
+*/*/*/.DS_Store
+*/*/*/*/.DS_Store
+/target/
+nb-configuration.xml
