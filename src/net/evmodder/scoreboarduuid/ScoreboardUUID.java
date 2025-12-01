@@ -1,8 +1,8 @@
 package net.evmodder.scoreboarduuid;
 
 import com.github.crashdemons.scoreboarduuid.ScoreboardUpdateBehavior;
-import net.evmodder.EvLib.EvPlugin;
-import net.evmodder.EvLib.extras.WebUtils;
+import net.evmodder.EvLib.bukkit.EvPlugin;
+import net.evmodder.EvLib.bukkit.WebUtils;
 import net.evmodder.EvLib.util.Pair;
 import java.util.ArrayList;
 import java.util.HashMap;
