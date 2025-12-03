@@ -183,8 +183,7 @@ public class ScoreboardUUID extends EvPlugin implements Listener{
 			ArrayList<String> nameUpdates = new ArrayList<>();
 			nameUpdates.add(evt.getPlayer().getName());
 			while(offlinePlayer.getName() != null && !offlinePlayer.getUniqueId().equals(uuidOfNewPlayer)){
-				final String newName = WebUtils.getGameProfile(""+offlinePlayer.getUniqueId(),
-						/*fetchSkin=*/false, /*nullForSync=*/null).getName();
+				final String newName = WebUtils.getProfile(""+offlinePlayer.getUniqueId(), /*fetchSkin=*/false, /*nullForSync=*/null).name();
 				nameUpdates.add(newName);
 				uuidOfNewPlayer = offlinePlayer.getUniqueId();
 				offlinePlayer = getServer().getOfflinePlayer(newName);
